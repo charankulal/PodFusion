@@ -29,19 +29,29 @@ import { Textarea } from "@/components/ui/textarea";
 import GeneratePodcast from "@/components/GeneratePodcast";
 import GenerateThumbnail from "@/components/GenerateThumbnail";
 import { Loader } from "lucide-react";
+import { Id } from "@/convex/_generated/dataModel";
 
 const voiceCategories = ["alloy", "shimmer", "nova", "echo", "fable", "onyx"];
 
 const formSchema = z.object({
-  podcastTitle: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-  podcastDescription: z.string(),
+  podcastTitle: z.string().min(2),
+  podcastDescription: z.string().min(2),
 });
 
 const CreatePodcast = () => {
   const [voiceType, setVoiceType] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imagePrompt, setImagePrompt] = useState("");
+  const [imageStorageId, setImageStorageId] = useState<Id<"_storage"> | null>(
+    null
+  );
+  const [audioUrl, setAudioUrl] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [audioStorageId, setAudioStorageId] = useState<Id<"_storage"> | null>(
+    null
+  );
+  const [audioDuration, setAudioDuration] = useState(0);
+  const [voicePrompt, setVoicePrompt] = useState('')
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -145,26 +155,33 @@ const CreatePodcast = () => {
           </div>
 
           <div className="flex flex-col pt-10">
-            <GeneratePodcast />
+            <GeneratePodcast 
+            setAudioStorageId={setAudioStorageId}
+            setAudio={setAudioUrl}
+            voiceType={voiceType}
+            audio={audioUrl}
+            voicePrompt={voicePrompt}
+            setVoicePrompt={setVoicePrompt}
+            setAudioDuration={setAudioDuration}
+
+            />
             <GenerateThumbnail />
             <div className="mt-10 w-full">
-              <Button type="submit" className="text-16 w-full bg-orange-1 py-4 font-extrabold text-white-1 transition-all duration-500 hover:bg-black-1">
-                { isSubmitting?(
+              <Button
+                type="submit"
+                className="text-16 w-full bg-orange-1 py-4 font-extrabold text-white-1 transition-all duration-500 hover:bg-black-1"
+              >
+                {isSubmitting ? (
                   <>
-                  <Loader size={20} className="animate-spin mr-2"/>
-                  Submitting</>
-                ):(
-                 
-                  'Submit & Publish Podcast'
-                
-                )
-              
-              }
+                    <Loader size={20} className="animate-spin mr-2" />
+                    Submitting
+                  </>
+                ) : (
+                  "Submit & Publish Podcast"
+                )}
               </Button>
             </div>
-
           </div>
-
         </form>
       </Form>
     </section>
