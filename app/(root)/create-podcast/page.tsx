@@ -30,6 +30,11 @@ import GeneratePodcast from "@/components/GeneratePodcast";
 import GenerateThumbnail from "@/components/GenerateThumbnail";
 import { Loader } from "lucide-react";
 import { Id } from "@/convex/_generated/dataModel";
+import { useToast } from "@/components/ui/use-toast";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useRouter } from "next/navigation";
+
 
 const voiceCategories = ["alloy", "shimmer", "nova", "echo", "fable", "onyx"];
 
@@ -39,6 +44,7 @@ const formSchema = z.object({
 });
 
 const CreatePodcast = () => {
+  const router=useRouter()
   const [voiceType, setVoiceType] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imagePrompt, setImagePrompt] = useState("");
@@ -52,6 +58,7 @@ const CreatePodcast = () => {
   );
   const [audioDuration, setAudioDuration] = useState(0);
   const [voicePrompt, setVoicePrompt] = useState('')
+  const createPodcast = useMutation(api.podcasts.createPodcast)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -61,8 +68,44 @@ const CreatePodcast = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  const { toast } = useToast()
+
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    try {
+      setIsSubmitting(true)
+      if (!audioUrl || !imageUrl || !voiceType) {
+        toast({
+          title: "Please generate audio and thumbnail"
+        })
+        setIsSubmitting(false)
+      }
+
+      const podcast=await createPodcast({
+        podcastTitle: data.podcastTitle,
+        podcastDescription: data.podcastDescription,
+        audioUrl,
+        imageUrl,
+        voiceType:voiceType!,
+        audioStorageId: audioStorageId!,
+        imageStorageId: imageStorageId!,
+        audioDuration,
+        imagePrompt,
+        voicePrompt,
+        views: 0,
+      })
+      toast({
+        title:"Podcast Created"
+      })
+      setIsSubmitting(false)
+      router.push('/')
+
+    } catch (error) {
+      setIsSubmitting(false)
+      toast({
+        title: "Error in submitting form"
+      })
+    }
+
   }
 
   return (
