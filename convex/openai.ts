@@ -1,7 +1,8 @@
+import { SpeechCreateParams } from 'openai/src/resources/audio/speech';
 import { OpenAI } from './../node_modules/openai/src/index';
 import { v } from "convex/values";
 import { action } from "./_generated/server";
-import { SpeechCreateParams } from 'openai/src/resources/audio/speech.js';
+
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
