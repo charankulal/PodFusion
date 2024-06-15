@@ -1,5 +1,5 @@
 import { SpeechCreateParams } from 'openai/src/resources/audio/speech';
-import { OpenAI } from './../node_modules/openai/src/index';
+import { OpenAI } from 'openai';
 import { v } from "convex/values";
 import { action } from "./_generated/server";
 
